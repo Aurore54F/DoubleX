@@ -1,0 +1,31 @@
+{
+    "extension": "../examples/dynamic-invocation",
+    "benchmarks": {},
+    "cs": {
+        "direct_dangers": {},
+        "indirect_dangers": {},
+        "exfiltration_dangers": {}
+    },
+    "bp": {
+        "direct_dangers": {
+            "danger1": {
+                "danger": "tabs.executeScript",
+                "value": "chrome.tabs.executeScript(<pdg_js.node.ValueExpr object at 0x10aa5c350>)",
+                "sink-param1": "{code: msg.code}",
+                "line": "3 - 3",
+                "filename": "../examples/dynamic-invocation/background.js",
+                "dataflow": true,
+                "param_id0": {
+                    "received_from_wa_1": {
+                        "wa": "event",
+                        "line": "1 - 1",
+                        "filename": "../examples/dynamic-invocation/contentscript.js",
+                        "where": "event"
+                    }
+                }
+            }
+        },
+        "indirect_dangers": {},
+        "exfiltration_dangers": {}
+    }
+}

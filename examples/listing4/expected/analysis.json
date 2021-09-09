@@ -1,0 +1,40 @@
+{
+    "extension": "../examples/listing4",
+    "benchmarks": {},
+    "cs": {
+        "direct_dangers": {
+            "danger1": {
+                "danger": "eval",
+                "value": "window.eval(event.data)",
+                "sink-param1": "event.data",
+                "line": "2 - 2",
+                "filename": "../examples/listing4/contentscript.js",
+                "dataflow": true,
+                "param_id0": {
+                    "received_from_wa_1": {
+                        "wa": "event",
+                        "line": "1 - 1",
+                        "filename": "../examples/listing4/contentscript.js",
+                        "where": "event"
+                    }
+                }
+            },
+            "danger2": {
+                "danger": "eval",
+                "value": "eval(42)",
+                "sink-param1": 42,
+                "line": "4 - 4",
+                "filename": "../examples/listing4/contentscript.js",
+                "dataflow": false,
+                "param_id0": {}
+            }
+        },
+        "indirect_dangers": {},
+        "exfiltration_dangers": {}
+    },
+    "bp": {
+        "direct_dangers": {},
+        "indirect_dangers": {},
+        "exfiltration_dangers": {}
+    }
+}

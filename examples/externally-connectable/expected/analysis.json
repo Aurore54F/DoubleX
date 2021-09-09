@@ -1,0 +1,30 @@
+{
+    "extension": "../examples/externally-connectable",
+    "benchmarks": {},
+    "cs": {
+        "direct_dangers": {},
+        "indirect_dangers": {},
+        "exfiltration_dangers": {}
+    },
+    "bp": {
+        "direct_dangers": {},
+        "indirect_dangers": {},
+        "exfiltration_dangers": {
+            "danger1": {
+                "danger": "history.search",
+                "value": "chrome.history.search(<pdg_js.node.ValueExpr object at 0x10aa5ed90>, <pdg_js.node.FunctionExpression object at 0x10aa5ea90>)",
+                "sink-param1": "{\n\t\ttext: \"\"\n\t}",
+                "sink-param2": "function(data) {\n\t\tsendResponse(data);\n\t}",
+                "line": "2 - 6",
+                "filename": "../examples/externally-connectable/background.js",
+                "dataflow": true,
+                "sent_to_wa_1": {
+                    "wa": "data",
+                    "line": "5 - 5",
+                    "filename": "../examples/externally-connectable/background.js",
+                    "where": "data"
+                }
+            }
+        }
+    }
+}

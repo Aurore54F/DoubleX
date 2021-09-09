@@ -1,0 +1,36 @@
+{
+  "cs": {
+    "direct_dangers": {
+      "CATEGORY1": [
+        "API1",
+        "API2"
+      ],
+      "CATEGORY2": [
+        "API1"
+      ]
+    },
+    "indirect_dangers": {
+      "CATEGORY1": [
+        "API1"
+      ]
+    },
+    "exfiltration_dangers": {}
+  },
+  "bp": {
+    "direct_dangers": {
+      "CATEGORY1": [
+        "API1"
+      ]
+    },
+    "indirect_dangers": {
+      "CATEGORY1": [
+        "API1"
+      ]
+    },
+    "exfiltration_dangers": {
+      "CATEGORY1": [
+        "API1"
+      ]
+    }
+  }
+}

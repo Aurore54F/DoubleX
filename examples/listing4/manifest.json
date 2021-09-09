@@ -1,0 +1,16 @@
+{
+  "name": "Example from Listing 4",
+  "version": "0.0",
+  "description": "Attacker-controllable data in eval in the content script",
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "contentscript.js"
+      ]
+    }
+  ],
+  "manifest_version": 2
+}

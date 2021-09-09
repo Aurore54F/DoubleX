@@ -1,0 +1,12 @@
+{
+    "name": "Data exfiltration",
+    "version": "0.0",
+    "description": "Confused deputy example, externally_connectable is not indicated",
+    "permissions": [
+        "history"
+    ],
+    "background": {
+        "scripts": ["background.js"]
+    },
+    "manifest_version": 2
+}

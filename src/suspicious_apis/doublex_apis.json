@@ -1,0 +1,70 @@
+{
+  "_description": "Suspicious APIs considered by DoubleX (per default)",
+  "cs": {
+    "direct_dangers": {
+      "execution": [
+        "eval",
+        "setInterval",
+        "setTimeout"
+      ],
+      "bypass_sop": [
+        "XMLHttpRequest().open",
+        "XMLHttpRequest.open"
+      ]
+    },
+    "indirect_dangers": {
+      "bypass_sop": [
+        "fetch",
+        "$.ajax",
+        "jQuery.ajax",
+        "$.get",
+        "jQuery.get",
+        "$.post",
+        "jQuery.post",
+        "$http.get",
+        "$http.post"
+      ]
+    },
+    "exfiltration_dangers": {}
+  },
+  "bp": {
+    "direct_dangers": {
+      "execution": [
+        "eval",
+        "tabs.executeScript",
+        "setInterval",
+        "setTimeout"
+      ],
+      "bypass_sop": [
+        "XMLHttpRequest().open",
+        "XMLHttpRequest.open"
+      ],
+      "download": [
+        "downloads.download"
+      ]
+    },
+    "indirect_dangers": {
+      "bypass_sop": [
+        "fetch",
+        "$.ajax",
+        "jQuery.ajax",
+        "$.get",
+        "jQuery.get",
+        "$.post",
+        "jQuery.post",
+        "$http.get",
+        "$http.post"
+      ]
+    },
+    "exfiltration_dangers": {
+      "cookies": [
+        "cookies.getAll"
+      ],
+      "privacy": [
+        "bookmarks.getTree",
+        "history.search",
+        "topSites.get"
+      ]
+    }
+  }
+}

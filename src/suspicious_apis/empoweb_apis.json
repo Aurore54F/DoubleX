@@ -1,0 +1,91 @@
+{
+  "_description": "Suspicious APIs from the EmPoWeb paper. To use only for the ground-truth analysis. Otherwise, see doublex_apis.json.",
+  "cs": {
+    "direct_dangers": {
+      "execution": [
+        "eval"
+      ],
+      "storage": [
+        "storage.local.set",
+        "storage.sync.set"
+      ],
+      "bypass_sop": [
+        "XMLHttpRequest().open",
+        "XMLHttpRequest.open"
+      ]
+    },
+    "indirect_dangers": {
+      "bypass_sop": [
+        "fetch",
+        "$.ajax",
+        "jQuery.ajax",
+        "$.get",
+        "jQuery.get",
+        "$.post",
+        "jQuery.post",
+        "$http.get",
+        "$http.post"
+      ],
+      "storage": [
+        "storage.local.get",
+        "storage.sync.get"
+      ]
+    },
+    "exfiltration_dangers": {}
+  },
+  "bp": {
+    "direct_dangers": {
+      "execution": [
+        "eval",
+        "tabs.executeScript"
+      ],
+      "storage": [
+        "storage.local.set",
+        "storage.sync.set"
+      ],
+      "bypass_sop": [
+        "XMLHttpRequest().open",
+        "XMLHttpRequest.open"
+      ],
+      "privacy": [
+        "management.setEnabled"
+      ],
+      "download": [
+        "downloads.download"
+      ]
+    },
+    "indirect_dangers": {
+      "bypass_sop": [
+        "fetch",
+        "$.ajax",
+        "jQuery.ajax",
+        "$.get",
+        "jQuery.get",
+        "$.post",
+        "jQuery.post",
+        "$http.get",
+        "$http.post"
+      ],
+      "storage": [
+        "storage.local.get",
+        "storage.sync.get"
+      ]
+    },
+    "exfiltration_dangers": {
+      "cookies": [
+        "cookies.getAll"
+      ],
+      "privacy": [
+        "bookmarks.getTree",
+        "history.search",
+        "history.getVisits",
+        "topSites.get",
+        "management.getAll"
+      ],
+      "storage": [
+        "storage.local.get",
+        "storage.sync.get"
+      ]
+    }
+  }
+}

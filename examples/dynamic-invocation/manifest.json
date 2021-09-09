@@ -1,0 +1,19 @@
+{
+    "name": "Dynamic sink invocation",
+    "version": "0.0",
+    "description": "Content script forwards web page messages to background + dynamic tabs.executeScript invocation in background",
+    "permissions": [
+        "<all_urls>"
+    ],
+    "background": {
+        "scripts": ["background.js"]
+    },
+    "content_scripts": [
+        {
+            "js": ["contentscript.js"],
+            "matches": ["<all_urls>"]
+        }
+    ],
+    "content_security_policy": "default-src 'self' 'unsafe-eval'",
+    "manifest_version": 2
+}

@@ -1,0 +1,23 @@
+{
+  "_description": "Suspicious APIs considered by DoubleX for ../examples/externally-connectable",
+  "cs": {
+    "direct_dangers": {
+      "execution": [
+        "eval",
+        "setInterval",
+        "setTimeout"
+      ]
+    },
+    "indirect_dangers": {},
+    "exfiltration_dangers": {}
+  },
+  "bp": {
+    "direct_dangers": {},
+    "indirect_dangers": {},
+    "exfiltration_dangers": {
+      "privacy": [
+        "history.search"
+      ]
+    }
+  }
+}

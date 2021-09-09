@@ -1,0 +1,22 @@
+{
+    "name": "Aliasing",
+    "version": "0.0",
+    "description": "Message-passing API aliased in the content script + content script forwards web page messages to background",
+    "permissions": [
+        "cookies",
+        "webRequest",
+        "webRequestBlocking",
+        "<all_urls>"
+    ],
+    "background": {
+        "scripts": ["background.js"]
+    },
+    "content_scripts": [
+        {
+            "js": ["contentscript.js"],
+            "matches": ["<all_urls>"]
+        }
+    ],
+    "content_security_policy": "default-src 'self' 'unsafe-eval'",
+    "manifest_version": 2
+}
