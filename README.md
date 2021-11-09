@@ -19,6 +19,7 @@ install npm
 cd src
 npm install esprima # (tested with 4.0.1)
 npm install escodegen # (tested with 1.14.2 and 2.0.0)
+npm -g install js-beautify
 ```
 
 
@@ -26,16 +27,22 @@ npm install escodegen # (tested with 1.14.2 and 2.0.0)
 
 DoubleX can analyze both Chromium-based and Firefox extensions.
 
+### Unpack a Chrome Extension
+
+If you already have extracted the content scripts, background scripts/page, WARs, and manifest, directly move on to the next section `Chrome Extensions`. Otherwise, you can extract these components from a packed extension `CRX_PATH` and store them in `UNPACKED_PATH/extension_name` by running the following command:
+```
+python3 src/unpack_extension.py -s 'CRX_PATH' -d 'UNPACKED_PATH'
+```
+
+
 ### Chrome Extensions
 
-To analyze a Chrome extension with the content script `CONTENT_SCRIPT` and background page `BACKGROUND_PAGE`, run the following commands from the `src` folder:
+To analyze a Chrome extension with the content script `CONTENT_SCRIPT` and background page `BACKGROUND_PAGE`, run the following command:
 ```
 python3 src/doublex.py -cs 'CONTENT_SCRIPT' -bp 'BACKGROUND_PAGE'
 ```
 
-Note 1: I will add the code to unpack a Chrome extension and extract the different components as soon as possible.
-
-Note 2: DoubleX can also analyze Firefox extensions (i.e., not Chromium-based). In this case, add the parameter `--not-chrome`:
+Note: DoubleX can also analyze Firefox extensions (i.e., not Chromium-based). In this case, add the parameter `--not-chrome`:
 ```
 python3 src/doublex.py -cs 'CONTENT_SCRIPT' -bp 'BACKGROUND_PAGE' --not-chrome
 ```
@@ -68,26 +75,26 @@ To run DoubleX on our ground-truth dataset and compare with EmPoWeb's findings o
 
 As an illustration of DoubleX's capabilities (e.g., aliasing, APIs not written in plain text, dynamic sink invocations, message forwarding between extension components, or confused deputy), we wrote some custom examples in the `examples` folder:
 
-- `examples/listing4/` contains the vulnerable content script example from Listing 4 of the paper. The analysis can be run from the `src` folder with:
+- `examples/listing4/` contains the vulnerable content script example from Listing 4 of the paper. The analysis can be run with:
 ```
 python3 src/doublex.py -cs 'examples/listing4/contentscript.js' -bp 'examples/listing4/background.js'
 ```
 Two files will be generated in `examples/listing4/`, namely `extension_doublex_apis.json` (i.e., sensitive APIs for which the extension has the corresponding permissions) and `analysis.json` (i.e., DoubleX data flow reports). The expected results are in the `expected` folder.  
 As discussed in §4.4.2 and §4.4.3, DoubleX correctly detects the two calls to `eval` (despite dynamic invocation for the first one) and correctly flags only the first one as attacker controllable.
 
-- `examples/alias/` contains an example with aliasing (as discussed in §5.3 of the paper). The analysis can be run from the `src` folder with:
+- `examples/alias/` contains an example with aliasing (as discussed in §5.3 of the paper). The analysis can be run with:
 ```
 python3 src/doublex.py -cs 'examples/alias/contentscript.js' -bp 'examples/alias/background.js'
 ```
 In particular, DoubleX accurately detects the message-passing API in the content script, despite aliasing. This can be read from the following lines of the analysis file: 1) lines 12-16: the sensitive API `eval` was detected in the background page, 2) line 17: a suspicious data flow (i.e., attacker-controlled) is going into `eval`, and 3) lines 19-24: this attacker-controllable data was received line 2 of the content script. Since there is a data flow from attacker-controlled data in the content script to `eval` in the background page, this means that DoubleX correctly detected the fact that the content script forwarded this attacker-controllable message to the background.
 
-- `examples/dynamic-invocation/` contains an example with a dynamic sink invocation (as discussed in §4.4.2 of the paper). The analysis can be run from the `src` folder with:
+- `examples/dynamic-invocation/` contains an example with a dynamic sink invocation (as discussed in §4.4.2 of the paper). The analysis can be run with:
 ```
 python3 src/doublex.py -cs 'examples/dynamic-invocation/contentscript.js' -bp 'examples/dynamic-invocation/background.js'
 ```
 As previously, DoubleX detects that the content script forwards an attacker-controllable message to the background (as indicated in the analysis file: message received in the content script but sink invoked in the background). In addition, DoubleX pointer analysis module correctly computes and identifies the call to "chrome.tabs.executeScript(attackerData)" in the background page (string concatenation and detection of the dynamic invocation with the bracket notation, similarly to the example of §4.4.2).
 
-- `examples/externally-connectable/` is a Confused Deputy example, i.e., this extension can be exploited by any extension, as it does not specify the `externally_connectable` entry in its manifest (as discussed in §2.2 and §3 of the paper). The analysis can be run from the `src` folder with:
+- `examples/externally-connectable/` is a Confused Deputy example, i.e., this extension can be exploited by any extension, as it does not specify the `externally_connectable` entry in its manifest (as discussed in §2.2 and §3 of the paper). The analysis can be run with:
 ```
 python3 src/doublex.py -cs 'examples/externally-connectable/contentscript.js' -bp 'examples/externally-connectable/background.js'
 ```
