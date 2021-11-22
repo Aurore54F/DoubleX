@@ -18,9 +18,13 @@
     To call DoubleX from the command-line.
 """
 
+import os
 import argparse
 
 from vulnerability_detection import analyze_extension
+
+
+SRC_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__)))
 
 
 def main():
@@ -32,10 +36,12 @@ def main():
                                                  "suspicious data flows")
 
     parser.add_argument("-cs", "--content-script", dest='cs', metavar="path", type=str,
-                        required=True, help="path of the content script")
+                        help="path of the content script. "
+                        "Default: empty/contentscript.js (i.e., empty JS file)")
     parser.add_argument("-bp", "--background-page", dest='bp', metavar="path", type=str,
-                        required=True, help="path of the background page "
-                                            "or path of the WAR if the parameter '--war' is given")
+                        help="path of the background page "
+                             "or path of the WAR if the parameter '--war' is given. "
+                             "Default for background: empty/background.js (i.e., empty JS file)")
 
     parser.add_argument("--war", action='store_true',
                         help="indicate that the parameter '-bp' is the path of a WAR")
@@ -58,7 +64,15 @@ def main():
     # TODO: control verbosity of logging?
 
     args = parser.parse_args()
-    analyze_extension(args.cs, args.bp, json_analysis=args.analysis, chrome=not args.not_chrome,
+
+    cs = args.cs
+    bp = args.bp
+    if cs is None:
+        cs = os.path.join(os.path.dirname(SRC_PATH), 'empty', 'contentscript.js')
+    if bp is None:
+        bp = os.path.join(os.path.dirname(SRC_PATH), 'empty', 'background.js')
+
+    analyze_extension(cs, bp, json_analysis=args.analysis, chrome=not args.not_chrome,
                       war=args.war, json_apis=args.apis, manifest_path=args.manifest)
 
 
