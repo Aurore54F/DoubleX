@@ -24,13 +24,13 @@ import logging
 import json
 
 
-def permission_check(extension, permission_set):
+def permission_check(manifest_path, permission_set):
     """ Checks and stores the relevant extension permissions. """
 
     try:
-        manifest = json.load(open(os.path.join(extension, 'manifest.json')))
+        manifest = json.load(open(manifest_path))
     except FileNotFoundError:
-        logging.critical('No manifest file found for %s', extension)
+        logging.critical('No manifest file found in %s', manifest_path)
         return None
 
     if manifest['manifest_version'] == 3:  # Other checks for manifest v3
@@ -87,7 +87,7 @@ def permission_check_v3(manifest, permission_set):
     return 3
 
 
-def generate_json_apis(extension, json_apis=None):
+def generate_json_apis(extension, manifest_path, json_apis=None):
     """ Generates a json file for DoubleX to analyze only relevant sensitive APIs and only if the
     extension has the corresponding permissions. """
 
@@ -96,12 +96,12 @@ def generate_json_apis(extension, json_apis=None):
     # ['bookmarks', 'cookies', 'downloads', 'history', 'topSites']: corresponding permission
 
     permission_set = set()
-    version = permission_check(extension, permission_set)  # collected extension permissions
+    version = permission_check(manifest_path, permission_set)  # collected extension permissions
     if version is None:  # if no manifest found
         return None  # this is different from no permission
     apis_dict = dict()
 
-    apis_dict['_description'] = "Suspicious APIs considered by DoubleX for " + extension
+    apis_dict['_description'] = "Suspicious APIs considered by DoubleX for " + manifest_path
 
     cs_dict = apis_dict['cs'] = {}
     cs_dict['direct_dangers'] = {}

@@ -276,7 +276,7 @@ def unpack_extension(extension_crx, dest):
     with open(os.path.join(dest, "wars.js"), "wb") as fh:
         fh.write(wars.encode())
 
-    logging.info('Extracted the components of %s in %s' % (extension_crx, dest))
+    logging.info('Extracted the components of %s in %s', extension_crx, dest)
 
 
 def extract_all(crx_path):

@@ -42,6 +42,11 @@ To analyze a Chrome extension with the content script `CONTENT_SCRIPT` and backg
 python3 src/doublex.py -cs 'CONTENT_SCRIPT' -bp 'BACKGROUND_PAGE'
 ```
 
+By default, DoubleX will consider that the extension `manifest.json` file is located in the same directory as the content script. A custom manifest location can be specified with the `--manifest` command:
+```
+python3 src/doublex.py -cs 'CONTENT_SCRIPT' -bp 'BACKGROUND_PAGE' --manifest 'CUSTOM_MANIFEST_PATH'
+```
+
 Note: DoubleX can also analyze Firefox extensions (i.e., not Chromium-based). In this case, add the parameter `--not-chrome`:
 ```
 python3 src/doublex.py -cs 'CONTENT_SCRIPT' -bp 'BACKGROUND_PAGE' --not-chrome

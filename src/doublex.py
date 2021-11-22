@@ -42,6 +42,9 @@ def main():
     parser.add_argument("--not-chrome", dest='not_chrome', action='store_true',
                         help="indicate that the extension is not based on Chromium, e.g., for a Firefox extension")
 
+    parser.add_argument("--manifest", metavar="path", type=str,
+                        help="path of the extension manifest.json file. "
+                             "Default: parent-path-of-content-script/manifest.json")
     parser.add_argument("--analysis", metavar="path", type=str,
                         help="path of the file to store the analysis results in. "
                              "Default: parent-path-of-content-script/analysis.json")
@@ -56,7 +59,7 @@ def main():
 
     args = parser.parse_args()
     analyze_extension(args.cs, args.bp, json_analysis=args.analysis, chrome=not args.not_chrome,
-                      war=args.war, json_apis=args.apis)
+                      war=args.war, json_apis=args.apis, manifest_path=args.manifest)
 
 
 if __name__ == "__main__":

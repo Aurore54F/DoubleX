@@ -30,7 +30,7 @@ def is_insecure_there(value):
 
     for insecure in INSECURE:
         if insecure in value:
-            logging.info('Found a call to %s', insecure)
+            logging.debug('Found a call to %s', insecure)
 
 
 def display_values(var, keep_none=True, check_insecure=True, recompute=False):
