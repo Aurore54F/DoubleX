@@ -75,12 +75,8 @@ logging.basicConfig(format='%(levelname)s: %(filename)s: %(message)s', level=log
 def micro_benchmark(message, elapsed_time):
     """ Micro benchmarks. """
     logging.info('%s %s%s', message, str(elapsed_time), 's')
+    print('CURRENT STATE %s %s%s' % (message, str(elapsed_time), 's'))
     return timeit.default_timer()
-
-
-def get_ram_usage(ram):
-    """ Printing the RAM usage. """
-    logging.info('%s %s%s', 'Current RAM usage:', str(ram / 1024 / 1024 / 1024), 'GB')
 
 
 class Timeout:

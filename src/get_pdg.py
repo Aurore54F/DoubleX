@@ -30,7 +30,7 @@ import pdg_js.utility_df as utility_df
 def get_pdg(file_path, res_dict, store_pdgs=None):
     """ Gets the PDG of a given file. """
 
-    return get_data_flow(file_path, benchmarks=res_dict, store_pdgs=store_pdgs,
+    return get_data_flow(file_path, benchmarks=res_dict, store_pdgs=store_pdgs, save_path_pdg=False,
                          beautiful_print=False, check_json=False)
 
 

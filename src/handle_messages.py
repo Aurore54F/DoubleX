@@ -86,6 +86,8 @@ def find_callback_def(handle_callback, param_nb):
                         continue
                     message, fun = find_callback_def(param, param_nb)  # Should go to Case 1 now
                     message_list.append(message)
+                    # print(len(message_list))
+                    # print(message.attributes)  # TODO can be several messages
                     return message, fun
                 # return message_list, fun
             try:
@@ -125,6 +127,7 @@ def find_callback_call(handle_callback, visited):
         return handle_callback.fun_params[0]  # params[0] = message
 
     if isinstance(handle_callback, _node.ValueExpr):
+        # arrow function, something strange occurs
         return None
 
     if not hasattr(handle_callback, "data_dep_children"):
@@ -138,6 +141,7 @@ def find_callback_call(handle_callback, visited):
             if hasattr(fun_handle_message, 'fun_param_parents'):  # Aliasing case, looks for params
                 params = fun_handle_message.fun_param_parents  # Gets parameter's values
                 for param in params:
+                    # for some random reason, this creates an infinite recursion
                     if handle_callback != param:
                         responses = find_callback_call(param, visited)
                         # Got the response objects this time
@@ -193,7 +197,7 @@ def browser_runtime_sendMessage(node, mess_type_from):
         if len(node.children) == 2:  # Number of children = CallExpr name + number parameters
             message = node.children[1]  # (mess)
         elif len(node.children) == 3:
-            message = node.children[2]  # (extensionId, mess)
+            message = node.children[2]  # (extensionId, mess) Note: (mess, options) could happen
         elif len(node.children) == 4:
             message = node.children[2]  # (extensionId, mess, options)
         else:
@@ -441,6 +445,8 @@ def chrome_runtime_sendMessage(node, mess_type_from):
 
     # Params can be (mess), (extensionId, mess), (extensionId, mess, options)
     # (mess, r), (extensionId, mess, r), (extensionId, mess, options, r)
+    # Actually, (mess, options) could happen but only found once
+    # (mess, options, r) could happen too, but did not find any extensions
 
     # Number of children = CallExpr name + number parameters
     if not resp and len(node.children) == 2 or resp and len(node.children) == 3:

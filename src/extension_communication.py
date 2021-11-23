@@ -21,6 +21,7 @@
 import logging
 import timeit
 import json
+import graphviz
 
 import pdg_js.node as _node
 from pdg_js.value_filters import display_values
@@ -28,6 +29,7 @@ import pdg_js.utility_df as utility_df
 
 import get_pdg
 from get_pdg import get_node_computed_value_e, get_node_value_e
+# import display_extension
 import browser_api
 import chrome_api
 import messages
@@ -218,6 +220,18 @@ def detect_onmessage(child, all_messages, where, chrome):
         - onmessage = f and the FunExpr/FunDecl f defined before
         """
 
+    # if isinstance(child, _node.FunctionExpression):  # Case: onmessage = function()
+    #     cond = True
+    #     if child.fun_name is not None:
+    #         fun_expr_value = get_node_computed_value_e(child.fun_name)  # Access to fun's name
+    #         if isinstance(fun_expr_value, _node.Node):
+    #             # If Id = FunExpr, value of Id is FunExpr, computing the value of FunExpr...
+    #             # ... gives Id as FunExpr name, so needs to get Id's attributes hence:
+    #             fun_expr_value = get_node_value_e(fun_expr_value)  # get_node_value_e
+    #         if isinstance(fun_expr_value, str):  # No need to check if it is not a str
+    #             # Checks if fun_expr_value is part of an API to exchange messages
+    #             find_message(child, fun_expr_value, all_messages, where=where, chrome=chrome)
+
     # if where == 'cs2wa' and child.name == 'AssignmentExpression':
     if len(child.children) == 2:
         var = child.children[0]
@@ -359,6 +373,7 @@ def link_all_messages(pdg1, pdg2, where1, where2, benchmarks, chrome, graph=None
         find_all_messages(pdg1, all_messages, where=where1, chrome=chrome)
         find_all_messages(pdg2, all_messages, where=where2, chrome=chrome)
 
+        benchmarks['collected messages'] = timeit.default_timer() - start
         start = utility_df.micro_benchmark('Successfully collected all messages exchanged in',
                                            timeit.default_timer() - start)
 
@@ -387,6 +402,13 @@ def link_all_messages(pdg1, pdg2, where1, where2, benchmarks, chrome, graph=None
             utility.print_separator()
             link_message(pdg1, partner2.responded, partner1.got_response, graph)
 
+        # Building the PDGs again to be sure that DF/provenance/values are up-to-date
+        # utility.print_info('Rebuilding CS PDG:')
+        # pdg1 = df_scoping(pdg1, scopes=[_scope.Scope('Global')], id_list=[], entry=1)[0]
+        # utility.print_info('Rebuilding BP PDG:')
+        # pdg2 = df_scoping(pdg2, scopes=[_scope.Scope('Global')], id_list=[], entry=1)[0]
+        # utility.print_separator()
+
     try:
         with utility.Timeout(10):  # Updating provenance should be extra fast
             update_provenance(pdg1)  # Updates provenance by avoiding inconsistencies
@@ -403,6 +425,7 @@ def link_all_messages(pdg1, pdg2, where1, where2, benchmarks, chrome, graph=None
     except utility_df.Timeout.Timeout as e:
         raise e  # Will be caught in vulnerability_detection
 
+    benchmarks['linked messages'] = timeit.default_timer() - start
     utility_df.micro_benchmark('Successfully linked the messages sent and received in',
                                timeit.default_timer() - start)
 
@@ -424,9 +447,11 @@ def produce_extension_pdg(cs_path, bp_path, benchmarks):
     # Builds the 2 PDGs
     utility.print_info('> PDG of ' + cs_path)
     pdg_cs = get_pdg.get_pdg(file_path=cs_path, res_dict=benchmarks)  # Builds CS PDG
+    update_benchmarks_pdg(benchmarks=benchmarks, whoami='cs')
 
     utility.print_info('---\n> PDG of ' + bp_path)
     pdg_bp = get_pdg.get_pdg(file_path=bp_path, res_dict=benchmarks)
+    update_benchmarks_pdg(benchmarks=benchmarks, whoami='bp')
 
     return pdg_cs, pdg_bp
 
@@ -441,6 +466,7 @@ def get_analysis(pdg_path, benchmarks, whoami):
         with open(benchmarks_path) as json_data:
             try:
                 my_benchmarks = json.loads(json_data.read())
+                update_benchmarks_pdg(benchmarks=my_benchmarks, whoami=whoami)
                 for k, v in my_benchmarks.items():
                     benchmarks[k] = v
             except json.decoder.JSONDecodeError:
@@ -496,7 +522,7 @@ def build_extension_pdg(cs_path, bp_path, benchmarks, pdg, chrome, messages_dict
                                                benchmarks=benchmarks)
 
     utility.print_info('---\n> Links messages')
-    graph = None
+    graph = graphviz.Digraph(comment='Extension Dependence Graph (EDG)')
 
     # Links CS and BP using their messages + builds PDGs again
     try:
@@ -505,6 +531,13 @@ def build_extension_pdg(cs_path, bp_path, benchmarks, pdg, chrome, messages_dict
                                            graph=graph, messages_dict=messages_dict)
     except utility_df.Timeout.Timeout:
         logging.exception('Linking messages timed out for %s %s', cs_path, bp_path)
+        if 'crashes' not in benchmarks:
+            benchmarks['crashes'] = []
+        benchmarks['crashes'].append('linking-messages-timeout')
+
+    # Displays Extension Dependence Graph (EDG)
+    # display_extension.draw_extensions(pdg_cs, pdg_bp, graph, save_path=None)
+    # display_extension.draw_ast(pdg_bp, attributes=True, save_path=None)  # BP's AST
 
     return pdg_cs, pdg_bp
 
@@ -519,7 +552,7 @@ def debug_wa_communication(wa_path, path2, who_is, chrome=True):
         pdg_wa = get_pdg.get_pdg(wa_path, res_dict=dict())
     pdg2 = get_pdg.get_pdg(path2, res_dict=dict())
 
-    graph = None
+    graph = graphviz.Digraph(comment='Debug EDG')
 
     if who_is == 'cs':  # Links WA and CS through messages
         link_all_messages(pdg1=pdg_wa, pdg2=pdg2, where1='wa2cs', where2='cs2wa',
@@ -529,6 +562,9 @@ def debug_wa_communication(wa_path, path2, who_is, chrome=True):
                           benchmarks=dict(), chrome=chrome, graph=graph)
     else:
         logging.error('Expected \'cs\' or \'bp\', got %s', who_is)
+
+    # Displays Extension Dependence Graph (EDG)
+    # display_extension.draw_extensions(pdg_wa, pdg2, graph)
 
 
 def update_call_expr(node):
@@ -541,6 +577,25 @@ def update_call_expr(node):
             child.set_value(call_expr_value)
             display_values(var=child)
         update_call_expr(child)
+
+
+def update_benchmarks_pdg(benchmarks, whoami):
+    """ PDG generation benchmarks are generic, here we make the difference between CS and BP. """
+
+    if 'errors' in benchmarks:
+        if 'crashes' not in benchmarks:
+            benchmarks['crashes'] = []
+        crashes = benchmarks.pop('errors')
+        for el in crashes:
+            benchmarks['crashes'].append(whoami + ': ' + el)
+    if 'got AST' in benchmarks:
+        benchmarks[whoami + ': got AST'] = benchmarks.pop('got AST')
+    if 'AST' in benchmarks:
+        benchmarks[whoami + ': AST'] = benchmarks.pop('AST')
+    if 'CFG' in benchmarks:
+        benchmarks[whoami + ': CFG'] = benchmarks.pop('CFG')
+    if 'PDG' in benchmarks:
+        benchmarks[whoami + ': PDG'] = benchmarks.pop('PDG')
 
 
 def update_provenance(node):

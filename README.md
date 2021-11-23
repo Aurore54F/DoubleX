@@ -22,6 +22,13 @@ npm install escodegen # (tested with 1.14.2 and 2.0.0)
 npm -g install js-beautify
 ```
 
+To install graphviz (only for drawing graphs, not yet documented, please open an issue if interested)
+```
+pip3 install graphviz
+On MacOS: install brew and then brew install graphviz
+On Linux: sudo apt-get install graphviz
+```
+
 
 ## Usage
 
@@ -46,6 +53,8 @@ By default, DoubleX will consider that the extension `manifest.json` file is loc
 ```
 python3 src/doublex.py -cs 'CONTENT_SCRIPT' -bp 'BACKGROUND_PAGE' --manifest 'CUSTOM_MANIFEST_PATH'
 ```
+
+For performance reasons, you can generate the PDGs of the content script and background page beforehand. In this case, see the README in `src/pdg_js` and call the function `src/vulnerability_detection/analyze_extension` with 1) the path of the content script's PDG, 2) the path of the background page's PDG, and 3) the attribute `pdg` with the value True.
 
 Note: DoubleX can also analyze Firefox extensions (i.e., not Chromium-based). In this case, add the parameter `--not-chrome`:
 ```
